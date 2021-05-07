@@ -1,53 +1,58 @@
 const searchButton = document.querySelector('.input-button')
-const inputValue = document.querySelector('.input-value')
+const animeSearchKeywords = document.querySelector('.input-value')
 const animeContentWrapper = document.querySelector('.anime-wrapper')
-const form = document.querySelector('.form')
-const scheduleAnimeWrapper = document.querySelector('.schedule-anime-wrapper')
-const day = document.querySelector('#releaseDay')
+const formSearch = document.querySelector('.form')
+const scheduledAnimeWrapper = document.querySelector('.schedule-anime-wrapper')
+const dayOptions = document.querySelector('#releaseDayOptionValue')
 const feedback = document.querySelector('.feedback')
 
+// get anime data when user click search button
 searchButton.addEventListener('click', getAnimeData)
-form.addEventListener('submit', getAnimeData)
-document.addEventListener('load', getScheduleAnimeData( getAnimeDataScheduleURL() ))
+// get anime data when user using search formSearch
+formSearch.addEventListener('submit', getAnimeData)
+
+// get scheduled anime data when web in first load
+document.addEventListener('load', getScheduledAnimeData( getScheduledAnimeURL() ))
 
 
 function getOptionValue() {
-	return day.value.toLowerCase()
+	return dayOptions.value.toLowerCase()
 }
 
-function getAnimeDataScheduleURL(selectedDay = '', selected = false) {
-
+function getScheduledAnimeURL(selectedDay = '', selected = false) {
+	// check if there's no selected day on <select> tag
 	if (!selected) {
 		const date = new Date ()
 		let todayName = ''
 		
 		if (date.getDay() === 0) {
 			todayName = 'sunday'
-			day.options[0].setAttribute('selected', 'selected')
+			dayOptions.options[0].setAttribute('selected', 'selected')
 		} else if (date.getDay() === 1) {
 			todayName = 'monday'
-			day.options[1].setAttribute('selected', 'selected')
+			dayOptions.options[1].setAttribute('selected', 'selected')
 		} else if (date.getDay() === 2) {
 			todayName = 'tuesday'
-			day.options[2].setAttribute('selected', 'selected')
+			dayOptions.options[2].setAttribute('selected', 'selected')
 		} else if (date.getDay() === 3) {
 			todayName = 'wednesday'
-			day.options[3].setAttribute('selected', 'selected')
+			dayOptions.options[3].setAttribute('selected', 'selected')
 		} else if (date.getDay() === 4) {
 			todayName = 'thursday'
-			day.options[4].setAttribute('selected', 'selected')
+			dayOptions.options[4].setAttribute('selected', 'selected')
 		} else if (date.getDay() === 5) {
 			todayName = 'friday'
-			day.options[5].setAttribute('selected', 'selected')
+			dayOptions.options[5].setAttribute('selected', 'selected')
 		} else if (date.getDay() === 6) {
 			todayName = 'saturday'
-			day.options[6].setAttribute('selected', 'selected')
+			dayOptions.options[6].setAttribute('selected', 'selected')
 		}
 		return {
 			url :`https://api.jikan.moe/v3/schedule/${todayName}`, 
 			day : todayName 
 		}
 	}
+	// return this data if theres selected day based on selected day on <select> tag
 	return {
 		url : `https://api.jikan.moe/v3/schedule/${selectedDay}`,
 		day : selectedDay
@@ -55,48 +60,59 @@ function getAnimeDataScheduleURL(selectedDay = '', selected = false) {
 
 }
 
-async function getScheduleAnimeData(urls) {
+// get scheduled anime data
+async function getScheduledAnimeData(resource) {
 	
 	animeContentWrapper.innerHTML = ''
-	inputValue.value = ''
-	
-	const {url, day} = urls
-	const data = await fetchData(url, day)
-	showAnimeCards(data, scheduleAnimeWrapper)
+	animeSearchKeywords.value = ''
+
+	// fetching anime data from resource and pass it to data variable
+	const data = await fetchData(resource.url, resource.day)
+
+	// shwoing the results through cards
+	showAnimeDataToCards(data, scheduledAnimeWrapper)
 }
 
 async function getAnimeData(event) {
 
+	// preventing the web page when user submit the form
 	event.preventDefault()
 
-	scheduleAnimeWrapper.innerHTML = ''
-
-	let URL = `https://api.jikan.moe/v3/search/anime?q=${inputValue.value}`
+	// clearing cards anime container
+	scheduledAnimeWrapper.innerHTML = ''
+	
+	// fetching anime data
+	let URL = `https://api.jikan.moe/v3/search/anime?q=${animeSearchKeywords.value}&limit=15`
 	const animeData = await fetchData(URL, 'results')
-	showAnimeCards(animeData, animeContentWrapper)
+
+	// showing the fetching results through the cards
+	showAnimeDataToCards(animeData, animeContentWrapper)
 }
 
+// fetch anime data from API
 function fetchData(URL, key) {
-
 
 	feedback.textContent = 'Loading'
 
 	return fetch(URL)
 	.finally(() => feedback.textContent = '')
 	.then(response =>response.json())
-	.then(response => response[key], errorMessage => console.log(`gagal ${errorMessage}`))
+	.then(response => response[key])
+	.catch(errorMessage => console.log(`gagal ${errorMessage}`))
 }
 
-function showAnimeCards(animeData, wrapper = animeContentWrapper ) {
-	
-	const animes = animeData
+function showAnimeDataToCards(animeData, wrapper = animeContentWrapper ) {
 	
 	let animeCards = ``
-	animes.forEach(anime => animeCards += createAnimeCards(anime))
+
+	// create html string for every cards
+	animeData.forEach(anime => animeCards += createAnimeCards(anime))
+
+	// injecting thoose html string through wrapper
 	wrapper.innerHTML = animeCards
 	
 	const detailButtons = document.querySelectorAll('.button-modal')
-	showAnimeDetails(animes, detailButtons)
+	showAnimeDetails(animeData, detailButtons)
 }
 
 function createAnimeCards(anime) {
@@ -116,19 +132,26 @@ function createAnimeCards(anime) {
 
 function showAnimeDetails(animes, detailButtons) {
 
+	// showing diffrent anime details on each "detail button"
 	detailButtons.forEach(detailButton => {
 		detailButton.addEventListener('click', (e) => {
 
-			const animeTitle = e.target.previousElementSibling.previousElementSibling.textContent
+			const animeTitle = e.target.previousElementSibling
+								.previousElementSibling.textContent
+
+			// return anime detail from filtering data based on anime title
 			const selectedAnimeDetail = animes.filter(anime => {
 				return anime.title == animeTitle
 			})
 
-			const listAnimeDetailWrapper = document.querySelector('.list-anime-detail')
+			const animeDetailsListWrapper = document.querySelector('.list-anime-detail')
 			const imageAnimePictureWrapper = document.querySelector('.img-detail')
 
+			// setting the detail image based on filtered anime
 			imageAnimePictureWrapper.setAttribute('src', selectedAnimeDetail[0].image_url)
-			listAnimeDetailWrapper.innerHTML = showAnimeDetail(selectedAnimeDetail)
+
+			// showing another information of the anime details based on filtered anime
+			animeDetailsListWrapper.innerHTML = showAnimeDetail(selectedAnimeDetail)
 		})
 	})
 }
@@ -140,9 +163,14 @@ function showAnimeDetail(anime) {
 	let endDate = anime[0].end_date
 	let startDate = anime[0].start_date
 
+	// check if the anime is airing
 	if ('airing_start' in anime[0]) {
 
+		// if yes, set the airing text based on API
 		airingText = anime[0].airing_start
+
+		// check if theres no endDate and startDate
+		// which is indicate that anime is still on going (airing)
 		if (!endDate) {
 			endDate = '-'
 			startDate = '-'
