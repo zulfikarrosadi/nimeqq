@@ -8,13 +8,13 @@ const feedback = document.querySelector('.feedback')
 
 // get anime data when user click search button
 searchButton.addEventListener('click', getAnimeData)
-// get anime data when user using search formSearch
+// get anime data when user using form
 formSearch.addEventListener('submit', getAnimeData)
 
-// get scheduled anime data when web in first load
+// get the on going anime data based on this day when the web is first load
 document.addEventListener('load', getScheduledAnimeData( getScheduledAnimeURL() ))
 
-
+// get the day value from <select> tag
 function getOptionValue() {
 	return dayOptions.value.toLowerCase()
 }
