@@ -24,29 +24,38 @@ function getScheduledAnimeURL(selectedDay = '', selected = false) {
 	if (!selected) {
 		const date = new Date ()
 		let todayName = ''
-		
-		if (date.getDay() === 0) {
-			todayName = 'sunday'
-			dayOptions.options[0].setAttribute('selected', 'selected')
-		} else if (date.getDay() === 1) {
-			todayName = 'monday'
-			dayOptions.options[1].setAttribute('selected', 'selected')
-		} else if (date.getDay() === 2) {
-			todayName = 'tuesday'
-			dayOptions.options[2].setAttribute('selected', 'selected')
-		} else if (date.getDay() === 3) {
-			todayName = 'wednesday'
-			dayOptions.options[3].setAttribute('selected', 'selected')
-		} else if (date.getDay() === 4) {
-			todayName = 'thursday'
-			dayOptions.options[4].setAttribute('selected', 'selected')
-		} else if (date.getDay() === 5) {
-			todayName = 'friday'
-			dayOptions.options[5].setAttribute('selected', 'selected')
-		} else if (date.getDay() === 6) {
-			todayName = 'saturday'
-			dayOptions.options[6].setAttribute('selected', 'selected')
+
+		switch (date.getDate()) {
+			case 0:
+				todayName = 'sunday'
+				dayOptions.options[0].setAttribute('selected', 'selected')
+				break;
+			case 1:
+				todayName = 'monday'
+				dayOptions.options[1].setAttribute('selected', 'selected')
+				break;
+			case 2:
+				todayName = 'tuesday'
+				dayOptions.options[2].setAttribute('selected', 'selected')
+				break;
+			case 3:
+				todayName = 'wednesday'
+				dayOptions.options[3].setAttribute('selected', 'selected')
+				break;
+			case 4:
+				todayName = 'thursday'
+				dayOptions.options[4].setAttribute('selected', 'selected')
+				break;
+			case 5:
+				todayName = 'friday'
+				dayOptions.options[5].setAttribute('selected', 'selected')
+				break;
+			case 6:
+				todayName = 'saturday'
+				dayOptions.options[6].setAttribute('selected', 'selected')
+				break;
 		}
+		
 		return {
 			url :`https://api.jikan.moe/v3/schedule/${todayName}`, 
 			day : todayName 
