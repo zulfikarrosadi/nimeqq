@@ -8,13 +8,13 @@ const feedback = document.querySelector('.feedback')
 
 // get anime data when user click search button
 searchButton.addEventListener('click', getAnimeData)
-// get anime data when user using form
+// get anime data when user using search formSearch
 formSearch.addEventListener('submit', getAnimeData)
 
-// get the on going anime data based on this day when the web is first load
+// get scheduled anime data when web in first load
 document.addEventListener('load', getScheduledAnimeData(getScheduledAnimeURL()))
 
-// get the day value from <select> tag
+
 function getOptionValue() {
 	return dayOptions.value.toLowerCase()
 }
@@ -25,37 +25,28 @@ function getScheduledAnimeURL(selectedDay = '', selected = false) {
 		const date = new Date()
 		let todayName = ''
 
-		switch (date.getDate()) {
-			case 0:
-				todayName = 'sunday'
-				dayOptions.options[0].setAttribute('selected', 'selected')
-				break;
-			case 1:
-				todayName = 'monday'
-				dayOptions.options[1].setAttribute('selected', 'selected')
-				break;
-			case 2:
-				todayName = 'tuesday'
-				dayOptions.options[2].setAttribute('selected', 'selected')
-				break;
-			case 3:
-				todayName = 'wednesday'
-				dayOptions.options[3].setAttribute('selected', 'selected')
-				break;
-			case 4:
-				todayName = 'thursday'
-				dayOptions.options[4].setAttribute('selected', 'selected')
-				break;
-			case 5:
-				todayName = 'friday'
-				dayOptions.options[5].setAttribute('selected', 'selected')
-				break;
-			case 6:
-				todayName = 'saturday'
-				dayOptions.options[6].setAttribute('selected', 'selected')
-				break;
+		if (date.getDay() === 0) {
+			todayName = 'sunday'
+			dayOptions.options[0].setAttribute('selected', 'selected')
+		} else if (date.getDay() === 1) {
+			todayName = 'monday'
+			dayOptions.options[1].setAttribute('selected', 'selected')
+		} else if (date.getDay() === 2) {
+			todayName = 'tuesday'
+			dayOptions.options[2].setAttribute('selected', 'selected')
+		} else if (date.getDay() === 3) {
+			todayName = 'wednesday'
+			dayOptions.options[3].setAttribute('selected', 'selected')
+		} else if (date.getDay() === 4) {
+			todayName = 'thursday'
+			dayOptions.options[4].setAttribute('selected', 'selected')
+		} else if (date.getDay() === 5) {
+			todayName = 'friday'
+			dayOptions.options[5].setAttribute('selected', 'selected')
+		} else if (date.getDay() === 6) {
+			todayName = 'saturday'
+			dayOptions.options[6].setAttribute('selected', 'selected')
 		}
-
 		return {
 			url: `https://api.jikan.moe/v3/schedule/${todayName}`,
 			day: todayName
@@ -74,7 +65,6 @@ async function getScheduledAnimeData(resource) {
 
 	animeContentWrapper.innerHTML = ''
 	animeSearchKeywords.value = ''
-
 	// fetching anime data from resource and pass it to data variable
 	const data = await fetchData(resource.url, resource.day)
 
