@@ -12,7 +12,7 @@ searchButton.addEventListener('click', getAnimeData)
 formSearch.addEventListener('submit', getAnimeData)
 
 // get the on going anime data based on this day when the web is first load
-document.addEventListener('load', getScheduledAnimeData( getScheduledAnimeURL() ))
+document.addEventListener('load', getScheduledAnimeData(getScheduledAnimeURL()))
 
 // get the day value from <select> tag
 function getOptionValue() {
@@ -22,7 +22,7 @@ function getOptionValue() {
 function getScheduledAnimeURL(selectedDay = '', selected = false) {
 	// check if there's no selected day on <select> tag
 	if (!selected) {
-		const date = new Date ()
+		const date = new Date()
 		let todayName = ''
 
 		switch (date.getDate()) {
@@ -55,23 +55,23 @@ function getScheduledAnimeURL(selectedDay = '', selected = false) {
 				dayOptions.options[6].setAttribute('selected', 'selected')
 				break;
 		}
-		
+
 		return {
-			url :`https://api.jikan.moe/v3/schedule/${todayName}`, 
-			day : todayName 
+			url: `https://api.jikan.moe/v3/schedule/${todayName}`,
+			day: todayName
 		}
 	}
 	// return this data if theres selected day based on selected day on <select> tag
 	return {
-		url : `https://api.jikan.moe/v3/schedule/${selectedDay}`,
-		day : selectedDay
+		url: `https://api.jikan.moe/v3/schedule/${selectedDay}`,
+		day: selectedDay
 	}
 
 }
 
 // get scheduled anime data
 async function getScheduledAnimeData(resource) {
-	
+
 	animeContentWrapper.innerHTML = ''
 	animeSearchKeywords.value = ''
 
@@ -89,7 +89,7 @@ async function getAnimeData(event) {
 
 	// clearing cards anime container
 	scheduledAnimeWrapper.innerHTML = ''
-	
+
 	// fetching anime data
 	let URL = `https://api.jikan.moe/v3/search/anime?q=${animeSearchKeywords.value}&limit=15`
 	const animeData = await fetchData(URL, 'results')
@@ -104,14 +104,14 @@ function fetchData(URL, key) {
 	feedback.textContent = 'Loading'
 
 	return fetch(URL)
-	.finally(() => feedback.textContent = '')
-	.then(response =>response.json())
-	.then(response => response[key])
-	.catch(errorMessage => console.log(`gagal ${errorMessage}`))
+		.finally(() => feedback.textContent = '')
+		.then(response => response.json())
+		.then(response => response[key])
+		.catch(errorMessage => console.log(`gagal ${errorMessage}`))
 }
 
-function showAnimeDataToCards(animeData, wrapper = animeContentWrapper ) {
-	
+function showAnimeDataToCards(animeData, wrapper = animeContentWrapper) {
+
 	let animeCards = ``
 
 	// create html string for every cards
@@ -119,7 +119,7 @@ function showAnimeDataToCards(animeData, wrapper = animeContentWrapper ) {
 
 	// injecting thoose html string through wrapper
 	wrapper.innerHTML = animeCards
-	
+
 	const detailButtons = document.querySelectorAll('.button-modal')
 	showAnimeDetails(animeData, detailButtons)
 }
@@ -146,7 +146,7 @@ function showAnimeDetails(animes, detailButtons) {
 		detailButton.addEventListener('click', (e) => {
 
 			const animeTitle = e.target.previousElementSibling
-								.previousElementSibling.textContent
+				.previousElementSibling.textContent
 
 			// return anime detail from filtering data based on anime title
 			const selectedAnimeDetail = animes.filter(anime => {
