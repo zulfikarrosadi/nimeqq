@@ -107,7 +107,7 @@ function createAnimeCards(anime) {
 				<img src="${anime.image_url}" class="card-img-top">
 				<div class="card-body">
 					<h5 class="card-title">${anime.title}</h5>
-					<h6 class="card-subtitle mb-2 text-muted">${anime.score}</h6>
+					<h6 class="card-subtitle mb-2 text-muted">${anime.score || 'Not rated yet'}</h6>
 					<button type="button" class="btn btn-primary button-modal" data-toggle="modal" data-target="#exampleModal" >Show details</button>
 				</div>
 			</div>
@@ -146,14 +146,25 @@ function showAnimeDetail(anime) {
   let airingText = 'Yes';
   let endDate = anime[0].end_date;
   let startDate = anime[0].start_date;
+  const score = anime[0].score || 'not rated yet';
 
   // check if the anime is airing
   if ('airing_start' in anime[0]) {
-    // if yes, set the airing text based on API
-    airingText = anime[0].airing_start;
+    const date = new Date(anime[0].airing_start);
+    const options = {
+      weekday: 'long',
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+      hour: 'numeric',
+      minute: 'numeric',
+      timezone: 'Asia/Jakarta',
+    };
+
+    airingText = date.toLocaleDateString('id-ID', options);
 
     // check if theres no endDate and startDate
-    // which is indicate that anime is still on going (airing)
+    // which indicate that anime is still on going (airing)
     if (!endDate) {
       endDate = '-';
       startDate = '-';
@@ -169,9 +180,13 @@ function showAnimeDetail(anime) {
   return `
 		<li class="list-group-item list-title">Title : ${anime[0].title}</h4></li>
 		<li class="list-group-item list-airing">Airing : ${airingText}</li>
-		<li class="list-group-item list-episode">Episode : ${anime[0].episodes}</li>
+		<li class="list-group-item list-episode">Episode : ${
+      anime[0].episodes || '-'
+    }</li>
 		<li class="list-group-item list-start-date">Start date : ${startDate}</li>
 		<li class="list-group-item list-end-date">End date : ${endDate}</li>
-		<li class="list-group-item list-score">Score : ${anime[0].score}</li>
-		<li class="list-group-item list-synopsis">Synopsis : ${anime[0].synopsis}</li> `;
+		<li class="list-group-item list-score">Score : ${score}</li>
+		<li class="list-group-item list-synopsis">Synopsis : ${
+      anime[0].synopsis
+    }</li> `;
 }
