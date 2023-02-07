@@ -5,6 +5,7 @@ const formSearch = document.querySelector('.form');
 const scheduledAnimeWrapper = document.querySelector('.schedule-anime-wrapper');
 const dayOptions = document.querySelector('#releaseDayOptionValue');
 const feedback = document.querySelector('.feedback');
+const API_BASE_URL_V4 = 'https://api.jikan.moe/v4/';
 
 searchButton.addEventListener('click', getAnimeData);
 formSearch.addEventListener('submit', getAnimeData);
@@ -47,13 +48,13 @@ function getScheduledAnimeURL(selectedDay = '', selected = false) {
       dayOptions.options[6].setAttribute('selected', 'selected');
     }
     return {
-      url: `https://api.jikan.moe/v3/schedule/${todayName}`,
+      url: `${API_BASE_URL_V4}schedules?filter=${todayName}`,
       day: todayName,
     };
   }
   // return this data if theres selected day based on selected day on <select> tag
   return {
-    url: `https://api.jikan.moe/v3/schedule/${selectedDay}`,
+    url: `${API_BASE_URL_V4}schedules?filter=${selectedDay}`,
     day: selectedDay,
   };
 }
@@ -63,8 +64,7 @@ async function getScheduledAnimeData(resource) {
   animeContentWrapper.innerHTML = '';
   animeSearchKeywords.value = '';
 
-  const data = await fetchData(resource.url, resource.day);
-
+  const data = await fetchData(resource.url, 'data');
   showAnimeDataToCards(data, scheduledAnimeWrapper);
 }
 
@@ -72,8 +72,8 @@ async function getAnimeData(event) {
   event.preventDefault();
   scheduledAnimeWrapper.innerHTML = '';
 
-  let URL = `https://api.jikan.moe/v3/search/anime?q=${animeSearchKeywords.value}&limit=15`;
-  const animeData = await fetchData(URL, 'results');
+  let URL = `${API_BASE_URL_V4}anime?q=${animeSearchKeywords.value}&limit=15`;
+  const animeData = await fetchData(URL, 'data');
 
   showAnimeDataToCards(animeData, animeContentWrapper);
 }
@@ -104,7 +104,7 @@ function createAnimeCards(anime) {
   return `
 		<div class="col-md-4 my-5">
 			<div class="card">
-				<img src="${anime.image_url}" class="card-img-top">
+				<img src="${anime.images.webp.image_url}" class="card-img-top">
 				<div class="card-body">
 					<h5 class="card-title">${anime.title}</h5>
 					<h6 class="card-subtitle mb-2 text-muted">${anime.score || 'Not rated yet'}</h6>
@@ -125,7 +125,7 @@ function showAnimeDetails(animes, detailButtons) {
       const selectedAnimeDetail = animes.filter((anime) => {
         return anime.title == animeTitle;
       });
-
+      console.log(selectedAnimeDetail);
       const animeDetailsListWrapper =
         document.querySelector('.list-anime-detail');
       const imageAnimePictureWrapper = document.querySelector('.img-detail');
@@ -133,7 +133,7 @@ function showAnimeDetails(animes, detailButtons) {
       // setting the detail image based on filtered anime
       imageAnimePictureWrapper.setAttribute(
         'src',
-        selectedAnimeDetail[0].image_url,
+        selectedAnimeDetail[0].images.webp.image_url,
       );
 
       // showing another information of the anime details based on filtered anime
@@ -143,48 +143,18 @@ function showAnimeDetails(animes, detailButtons) {
 }
 
 function showAnimeDetail(anime) {
-  let airingText = 'Yes';
-  let endDate = anime[0].end_date;
-  let startDate = anime[0].start_date;
   const score = anime[0].score || 'not rated yet';
-
-  // check if the anime is airing
-  if ('airing_start' in anime[0]) {
-    const date = new Date(anime[0].airing_start);
-    const options = {
-      weekday: 'long',
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-      hour: 'numeric',
-      minute: 'numeric',
-      timezone: 'Asia/Jakarta',
-    };
-
-    airingText = date.toLocaleDateString('id-ID', options);
-
-    // check if theres no endDate and startDate
-    // which indicate that anime is still on going (airing)
-    if (!endDate) {
-      endDate = '-';
-      startDate = '-';
-    }
-  } else {
-    if (!anime[0].airing) {
-      airingText = 'No';
-    } else {
-      endDate = '-';
-    }
-  }
-
   return `
 		<li class="list-group-item list-title">Title : ${anime[0].title}</h4></li>
-		<li class="list-group-item list-airing">Airing : ${airingText}</li>
+		<li class="list-group-item list-airing">Airing : ${
+      anime[0].airing ? 'Yes' : 'No'
+    }</li>
 		<li class="list-group-item list-episode">Episode : ${
       anime[0].episodes || '-'
     }</li>
-		<li class="list-group-item list-start-date">Start date : ${startDate}</li>
-		<li class="list-group-item list-end-date">End date : ${endDate}</li>
+		<li class="list-group-item list-start-date">Air Date : ${
+      anime[0].aired.string
+    }</li>
 		<li class="list-group-item list-score">Score : ${score}</li>
 		<li class="list-group-item list-synopsis">Synopsis : ${
       anime[0].synopsis
